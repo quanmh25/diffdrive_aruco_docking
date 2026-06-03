@@ -9,20 +9,20 @@ from launch_ros.substitutions import FindPackageShare
 from launch.actions import AppendEnvironmentVariable
 
 
+
 def generate_launch_description():
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
     pkg_lab = get_package_share_directory('robot_scene')
     xacro_file = os.path.join(pkg_lab, 'urdf', 'robot_model.xacro')
 
-    # Bổ sung đường dẫn thư mục models vào biến môi trường của Gazebo
+    # show path of models to help gazebo find it
     set_env_vars_resources = AppendEnvironmentVariable(
             'GZ_SIM_RESOURCE_PATH',
             os.path.join(pkg_lab, 'models')
     )
 
     world_path = PathJoinSubstitution([
-        FindPackageShare('robot_scene'),
-        'worlds','map.sdf'
+        FindPackageShare('robot_scene'), 'worlds','map.sdf'
     ])
 
     gz_sim = IncludeLaunchDescription(
@@ -95,7 +95,7 @@ def generate_launch_description():
         robot_state_publisher,
         spawn,
         bridge,
-        TimerAction(period=4.0, actions=[spawn_joint_state_broadcaster]),
-        TimerAction(period=6.0, actions=[spawn_diff_drive_controller]),
+        TimerAction(period=4.0, actions=[spawn_joint_state_broadcaster]),   #delay 4s
+        TimerAction(period=6.0, actions=[spawn_diff_drive_controller]), #delay 6s
         rviz,
     ])

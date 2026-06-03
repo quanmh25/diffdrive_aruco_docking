@@ -19,14 +19,13 @@ diff_drive_controller:
     wheel_radius: 0.1
 
     use_stamped_vel: true
-    cmd_vel_timeout: 2.0
+    cmd_vel_timeout: 2.0  # to stop the robot after 2s without receving data
     publish_limited_velocity: true
     base_frame_id: base_link
     odom_frame_id: odom
     enable_odom_tf: true
 
-    # Giới hạn vận tốc và gia tốc (Đặc biệt quan trọng cho thuật toán Docking)
-    # Giúp xe đi lùi mượt mà, không bị giật cục khi thuật toán tính ra sai số lớn
+    # to limit speed and acceleration
     linear.x.has_velocity_limits: true
     linear.x.has_acceleration_limits: true
     linear.x.max_velocity: 0.5

@@ -337,6 +337,8 @@
       </link>
     </model>
     
+
+    
     <include>
       <uri>model://aruco_1</uri>
       <pose>9.45 17.15 0 0 0 -1.57</pose> 

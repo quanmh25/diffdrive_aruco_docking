@@ -1,9 +1,9 @@
 <?xml version='1.0'?>
 <robot name="robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:include filename="materials.xacro" />
-    <xacro:include filename="robot_model.gazebo" />
     <xacro:include filename="wheel.xacro" />
     <xacro:include filename="inertial.xacro" />
+
 
     <ros2_control name="GazeboSimSystem" type="system">
         <hardware>
@@ -25,7 +25,15 @@
         </joint>
     </ros2_control>
 
-    
+    <gazebo>
+        <plugin filename="gz_ros2_control-system"
+        name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <parameters>
+            $(find robot_scene)/config/diff_control.yaml
+            </parameters>
+        </plugin>     
+    </gazebo>  
+
     <link name='base_link'>
         <origin xyz="0.0 0.0 0.1" rpy="0.0 0 0.0"/>
         <visual name='base_visual'>
@@ -131,9 +139,7 @@
     <link name="lidar_link">
         <visual name='lidar_visual'>
             <origin xyz="0 0 0" rpy=" 0 0 0"/>
-            <geometry>
-                <box size="0.05 0.05 0.05"/>
-            </geometry>
+            <geometry><box size="0.05 0.05 0.05"/></geometry>
             <material name="red"/>
         </visual>
         <inertial name="lidar_link_inertial">
@@ -145,9 +151,7 @@
         </inertial>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <box size="0.05 0.05 0.05"/>
-                </geometry>
+                <geometry><box size="0.05 0.05 0.05"/></geometry>
         </collision>
     </link>
     <joint name="lidar_joint" type="fixed">
