@@ -1,4 +1,4 @@
-# auto-aruco-diffdrive
+# DIFFDRIVE ARUCO DOCKING
 
 Practice 2026 - ROS 2 simulation project for an autonomous differential-drive robot that follows a track, detects ArUco markers, turns into a docking area, and performs automatic docking.
 
