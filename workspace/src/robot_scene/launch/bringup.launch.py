@@ -96,6 +96,6 @@ def generate_launch_description():
         spawn,
         bridge,
         TimerAction(period=4.0, actions=[spawn_joint_state_broadcaster]),   #delay 4s
-        TimerAction(period=6.0, actions=[spawn_diff_drive_controller]), #delay 6s
+        TimerAction(period=6.0, actions=[spawn_diff_drive_controller]),     #delay 6s
         rviz,
     ])

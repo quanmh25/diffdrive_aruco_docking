@@ -15,7 +15,7 @@ class PDController:
         derivative = (error - self.previous_error) / dt
         self.previous_error = error
         
-        # Tương đương kp_.cwiseProduct(error) + kd_.cwiseProduct(derivative) trong Eigen
+        # equivalent to kp_.cwiseProduct(error) + kd_.cwiseProduct(derivative) in Eigen
         return self.kp * error + self.kd * derivative
 
     def set_kp(self, kp):

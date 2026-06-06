@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 class ArucoMarkerDetector:
     def __init__(self, camera_matrix, dist_coeffs, dictionary_id=cv2.aruco.DICT_4X4_250):
         self.camera_matrix = np.array(camera_matrix, dtype=np.float32)

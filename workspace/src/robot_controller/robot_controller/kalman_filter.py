@@ -5,7 +5,7 @@ class ArucoKalmanFilter:
     def __init__(self, initial_pose, initial_cov, predict_noise, measure_noise):
         self.X_ = np.array(initial_pose, dtype=float).reshape(3, 1)  # State [x, y, yaw]
         
-        # Chuyển các mảng 1D (9 phần tử) thành ma trận 3x3
+        # convert array 1D to matrix 3x3
         self.P_ = np.array(initial_cov, dtype=float).reshape(3, 3)
         self.Q_ = np.array(predict_noise, dtype=float).reshape(3, 3)
         self.R_ = np.array(measure_noise, dtype=float).reshape(3, 3)
@@ -34,6 +34,6 @@ class ArucoKalmanFilter:
         I = np.eye(3)
         self.P_ = (I - K @ self.H_) @ self.P_
 
+    # return array [x, y, yaw]
     def get_state(self):
-        """Trả về mảng 1D: [x, y, yaw]"""
         return self.X_.flatten()

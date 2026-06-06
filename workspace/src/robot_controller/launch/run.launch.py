@@ -9,7 +9,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     pkg_sim = get_package_share_directory('robot_scene')
     
-    # 1. Gọi file Launch mô phỏng (Bao gồm Gazebo, RViz, Spawn robot, Bridge)
+    # Launch Simulation (Gazebo, RViz, Spawn robot, Bridge)
     sim_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_sim, 'launch', 'bringup.launch.py')

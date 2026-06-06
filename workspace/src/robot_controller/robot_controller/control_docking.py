@@ -41,7 +41,7 @@ class RobotControl(Node):
         self.avoid_dir = None
         self.mission = "FOLLOW_TRACK"
         self.docking_step = "DETECTION" 
-        self.has_detected_marker = False # để hệ thống biết camera đã thực sự nhìn thấy ArUco hay chưa
+        self.has_detected_marker = False 
 
         self.detected_count = 0
         self.max_linear_vel = 0.3
@@ -181,14 +181,14 @@ class RobotControl(Node):
     def send_aruco_transform(self, x, y, yaw, child_frame_id):
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = 'camera_link'  # Trục mốc gốc của camera
+        t.header.frame_id = 'camera_link'  
         t.child_frame_id = child_frame_id
         
         t.transform.translation.x = float(x)
         t.transform.translation.y = float(y)
         t.transform.translation.z = 0.0
         
-        # Công thức toán học chuyển đổi góc Yaw sang Quaternion
+        # convert yaw to quaternion
         t.transform.rotation.x = 0.0
         t.transform.rotation.y = 0.0
         t.transform.rotation.z = math.sin(yaw / 2.0)
@@ -254,46 +254,41 @@ class RobotControl(Node):
                 self.send_aruco_transform(wp_x, wp_y, wp_yaw, "aruco_waypoint1")
 
                 target_x, target_y, target_yaw = wp_x, wp_y, wp_yaw
-
                 if self.docking_step in ["STATION", "COME_TO_STATION"]:
                     target_x, target_y, target_yaw = tx, ty, tyaw
 
                 pd_input = [-target_x, -target_y, target_yaw]
-                
-                # SỬA LỖI 2: Ép xung dt = 30.0 theo đúng C++
                 output = self.pd_controller.update(pd_input, 30.0)
-                
-                # SỬA LỖI 3: Dùng hệ tọa độ Polar cho Linear & Angular
+
                 vel_r, vel_theta = xy_to_polar_coordinates(output[0], output[1])
-                
                 vel_linear = np.clip(vel_r, -self.max_linear_vel, self.max_linear_vel)
                 vel_angular = np.clip(vel_theta, -self.max_angular_vel, self.max_angular_vel)
 
                 if self.docking_step == "DETECTION":
                     if self.detected_count >= 120: 
                         self.docking_step = "WAYPOINT"
-                        self.get_logger().info("Chuyển: DETECTION -> WAYPOINT")
+                        self.get_logger().info("State changed: DETECTION -> WAYPOINT")
 
                 elif self.docking_step == "WAYPOINT":
                     self.robot_velocity_input[0] = 0.0
                     self.robot_velocity_input[1] = vel_angular
                     if abs(target_y) <= 0.01:
                         self.docking_step = "COME_TO_WAYPOINT"
-                        self.get_logger().info("Chuyển: WAYPOINT -> COME_TO_WAYPOINT")
+                        self.get_logger().info("State changed: WAYPOINT -> COME_TO_WAYPOINT")
 
                 elif self.docking_step == "COME_TO_WAYPOINT":
                     self.robot_velocity_input[0] = vel_linear
                     self.robot_velocity_input[1] = 0.0
                     if abs(target_x) <= 0.01:
                         self.docking_step = "STATION"
-                        self.get_logger().info("Chuyển: COME_TO_WAYPOINT -> STATION")
+                        self.get_logger().info("State changed: COME_TO_WAYPOINT -> STATION")
 
                 elif self.docking_step == "STATION":
                     self.robot_velocity_input[0] = 0.0
                     self.robot_velocity_input[1] = vel_angular
                     if abs(target_y) <= 0.01:
                         self.docking_step = "COME_TO_STATION"
-                        self.get_logger().info("Chuyển: STATION -> COME_TO_STATION")
+                        self.get_logger().info("State changed: STATION -> COME_TO_STATION")
 
                 elif self.docking_step == "COME_TO_STATION":
                     linear_finish = False
@@ -313,7 +308,7 @@ class RobotControl(Node):
                     if linear_finish and angular_finish:
                         self.docking_step = "END"
                         self.mission = "DOCKED"
-                        self.get_logger().info("HOÀN THÀNH DOCKING!")
+                        self.get_logger().info("Finish DOCKING!")
                 else:
                     self.robot_velocity_input[0] = 0.0
                     self.robot_velocity_input[1] = 0.0
@@ -342,7 +337,7 @@ class RobotControl(Node):
                 
                 if self.mission == "EXECUTE_TURN":
                     self.mission = "FOLLOW_TRACK"
-                    self.get_logger().info('Đã rẽ xong, khôi phục bám đường!')
+                    self.get_logger().info('Turn completed, resuming path tracking!')
 
             if self.white_hole and self.mission == "FOLLOW_TRACK":
                 if self.hole_position in ["LEFT", "CENTER"]:
@@ -369,6 +364,7 @@ def main(args=None):
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()
