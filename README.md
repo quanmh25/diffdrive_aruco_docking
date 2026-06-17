@@ -31,6 +31,9 @@ ROS 2 simulation project for an autonomous differential-drive robot. The robot f
 
 ```text
 .
++-- Dockerfile
++-- docker-compose.yaml
++-- .dockerignore
 +-- README.md
 `-- workspace/src
     |-- robot_controller
@@ -95,6 +98,99 @@ sudo apt install \
 ```
 
 Package names can differ slightly between ROS 2 distributions.
+
+## Docker Usage
+
+The project can also be run inside Docker. This is the recommended way to get a repeatable ROS 2, Gazebo, RViz, OpenCV, and `colcon` environment without installing every dependency directly on the host.
+
+The Docker setup uses:
+
+- `Dockerfile` to build the ROS 2 image.
+- `docker-compose.yaml` to start the container, mount this repository, enable GUI windows, and use host networking for ROS 2.
+- `.dockerignore` to keep build caches and Git metadata out of the Docker build context.
+
+### First Run
+
+From the repository root on the host machine:
+
+```bash
+cd diffdrive_aruco_docking
+export GID=$(id -g)
+xhost +local:docker
+docker compose up -d --build
+docker compose exec ros bash
+```
+
+After `docker compose exec ros bash`, the terminal is inside the container. Build and run the ROS 2 workspace there:
+
+```bash
+colcon build --symlink-install
+source install/setup.bash
+ros2 launch robot_controller run.launch.py
+```
+
+### Daily Run
+
+If the image has already been built:
+
+```bash
+cd diffdrive_aruco_docking
+export GID=$(id -g)
+xhost +local:docker
+docker compose up -d
+docker compose exec ros bash
+```
+
+Inside the container:
+
+```bash
+source install/setup.bash
+ros2 launch robot_controller run.launch.py
+```
+
+If source files or package configuration changed, rebuild first:
+
+```bash
+colcon build --symlink-install
+source install/setup.bash
+ros2 launch robot_controller run.launch.py
+```
+
+### Stop Docker
+
+Exit the container shell:
+
+```bash
+exit
+```
+
+Stop the container from the host terminal:
+
+```bash
+docker compose down
+```
+
+### Useful Docker Commands
+
+Show images:
+
+```bash
+docker images
+```
+
+Show all containers:
+
+```bash
+docker ps -a
+```
+
+Open a shell in the running ROS container:
+
+```bash
+docker compose exec ros bash
+```
+
+`docker compose` commands are run on the host machine. `colcon build`, `source install/setup.bash`, and `ros2 launch ...` are run inside the container.
 
 ## Build
 
@@ -215,6 +311,22 @@ If Gazebo cannot find models, rebuild and source the workspace:
 cd workspace
 colcon build --symlink-install
 source install/setup.bash
+```
+
+If Docker build succeeds but the container does not start because of a missing host group such as `render`, remove that group from `group_add` in `docker-compose.yaml` or replace it with a group that exists on the host.
+
+If `colcon build` fails with a `CMakeCache.txt` path mismatch, remove the old build cache and rebuild:
+
+```bash
+rm -rf build install log
+colcon build --symlink-install
+source install/setup.bash
+```
+
+If Gazebo, RViz, or `rqt_image_view` cannot open a window from Docker, allow local Docker X11 access from the host terminal:
+
+```bash
+xhost +local:docker
 ```
 
 ## Author
