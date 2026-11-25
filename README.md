@@ -25,7 +25,7 @@ ROS 2 simulation project for an autonomous differential-drive robot. The robot f
 
 ## Demo
 
-[![Leader-follower ArUco demo](docs/demo_thumbnail.png)](https://drive.google.com/file/d/12-GjgP0ez5qo0zRl9rY7XmKbH43HOQkx/view?usp=sharing)
+<video src="docs/Demo_aruco_docking.mp4" controls width="600"></video>
 
 ## Repository Structure
 
